@@ -528,8 +528,7 @@ class EStructExternalValueInConditionTestCase(unittest.TestCase):
         data=[0,0,0,8,0,0,0,2,0,0,0,1]
         data_str="".join([chr(x) for x in data])
                          
-        local={"testval":True}
-        obj=self.struct.unpack(data_str, **local)
+        obj=self.struct.unpack(data_str, testval=True)
         
         self.assertEqual( obj.f1, 8, "incorrect value: {}".format(obj.f1))
         self.assertEqual( obj.f2, 0x200000001, "incorrect value: {}".format(obj.f2))
@@ -537,8 +536,7 @@ class EStructExternalValueInConditionTestCase(unittest.TestCase):
         data=[]
         data_str="".join([chr(x) for x in data])
                          
-        local={"testval":False}
-        obj=self.struct.unpack(data_str, **local)
+        obj=self.struct.unpack(data_str, testval=False)
         
         self.assertEqual( obj.f1, None, "incorrect value: {}".format(obj.f1))
         self.assertEqual( obj.f2, None, "incorrect value: {}".format(obj.f2))
@@ -547,16 +545,14 @@ class EStructExternalValueInConditionTestCase(unittest.TestCase):
         data=[0,0,0,8,0,0,0,2,0,0,0,1]
         expected_data="".join([chr(x) for x in data])
 
-        local={"testval":True}
-        packed_result=self.struct.pack(8,0x200000001, **local)
+        packed_result=self.struct.pack(8,0x200000001, testval=True)
         
         self.assertEqual(packed_result,expected_data,"Invalid packing - {}".format(packed_result.encode("hex"))) 
 
         data=[]
         expected_data="".join([chr(x) for x in data])
 
-        local={"testval":False}
-        packed_result=self.struct.pack(None,None, **local)
+        packed_result=self.struct.pack(None,None, testval=False)
         
         self.assertEqual(packed_result,expected_data,"Invalid packing - {}".format(packed_result.encode("hex"))) 
 

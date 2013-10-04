@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 from estruct.estruct import EStruct, StructObject
 
 def run_example(name, testdata, struct_params, local={}):

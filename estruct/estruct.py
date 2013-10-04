@@ -455,7 +455,7 @@ class EStruct(object):
             result=''
         return result
     
-    def unpack(self, data, stuctures=None, **kargs):
+    def unpack(self, data, **kargs):
         results,_ = self.__unpack_results(data,self.__structures,self.__fields,**kargs)                                        
         return self.__fields.CreateInstance(self.__name, *results)
     
