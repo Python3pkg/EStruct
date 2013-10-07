@@ -22,7 +22,12 @@ class StructObjectTestCase(unittest.TestCase):
         self.assertEqual(self.struct_object.Fields, 
                          ['f1','f2','f3'],
                          'incorrect Fields')
-        
+   
+    def test_nodes(self):
+        self.assertEqual(self.struct_object.Nodes, 
+                         ['f1','f2.a1', 'f2.a2','f3.a1.b1','f3.a1.b2','f3.a2'],
+                         'incorrect Nodes: {}'.format(self.struct_object.Nodes))    
+            
     def test_sub_fields_invalid_field(self):
         self.assertRaises(KeyError, self.struct_object.SubFields, ("invalidField",))
         
@@ -215,6 +220,97 @@ class EStructNestedConditionalTestCase(unittest.TestCase):
         data=[0,0,0,0,0,0,0,3,0,0,0,1,0,0,0,2]
         data_str="".join([chr(x) for x in data])
         self.assertEqual(packed_result,data_str,"Invalid packing - {}".format(packed_result.encode("hex")))  
+        
+class EStructConditionalConsumeFieldsTestCase(unittest.TestCase):
+    def setUp(self):
+        self.struct=EStruct('Test','f1 f2 f3 f4','!I(f1==1?2|QI)B')
+
+    def tearDown(self):
+        del self.struct
+ 
+    def test_unpacking(self):
+        data=[0,0,0,1,2]
+        data_str="".join([chr(x) for x in data])
+                         
+        obj=self.struct.unpack(data_str)
+        self.assertEqual(obj.f1, 1, "incorrect value: {}".format(obj.f1))
+        self.assertEqual(obj.f2, None, "incorrect value: {}".format(obj.f2))
+        self.assertEqual(obj.f3, None, "incorrect value: {}".format(obj.f3))
+        self.assertEqual(obj.f4, 2, "incorrect value: {}".format(obj.f4))
+
+        data=[0,0,0,0,0,0,0,2,0,0,0,3,0,0,0,4,2]
+        data_str="".join([chr(x) for x in data])
+                         
+        obj=self.struct.unpack(data_str)
+        self.assertEqual(obj.f1, 0, "incorrect value: {}".format(obj.f1))
+        self.assertEqual(obj.f2, 0x200000003, "incorrect value: {}".format(obj.f2))
+        self.assertEqual(obj.f3, 4, "incorrect value: {}".format(obj.f3))
+        self.assertEqual(obj.f4, 2, "incorrect value: {}".format(obj.f4))
+        
+    def test_packing(self):
+        packed_result=self.struct.pack(1,None,None,2)
+        data=[0,0,0,1,2]
+        data_str="".join([chr(x) for x in data])
+        self.assertEqual(packed_result,data_str,"Invalid packing - {}".format(packed_result.encode("hex")))
+        
+        packed_result=self.struct.pack(0,0x0000000200000003,4,2)
+        data=[0,0,0,0,0,0,0,2,0,0,0,3,0,0,0,4,2]
+        data_str="".join([chr(x) for x in data])
+        self.assertEqual(packed_result,data_str,"Invalid packing - {}".format(packed_result.encode("hex")))  
+                
+class EStructNestedConditionalConsumeFieldsTestCase(unittest.TestCase):
+    def setUp(self):
+        self.struct=EStruct('Test','f1 f2 f3 f4 f5','!I(f1==1?I2|I(f2==1?2I|I1))B')
+
+    def tearDown(self):
+        del self.struct
+ 
+    def test_unpacking(self):
+        data=[0,0,0,1,0,0,0,2,5]
+        data_str="".join([chr(x) for x in data])
+                         
+        obj=self.struct.unpack(data_str)
+        self.assertEqual(obj.f1, 1, "incorrect value: {}".format(obj.f1))
+        self.assertEqual(obj.f2, 2, "incorrect value: {}".format(obj.f2))
+        self.assertEqual(obj.f3, None, "incorrect value: {}".format(obj.f3))
+        self.assertEqual(obj.f4, None, "incorrect value: {}".format(obj.f4))
+        self.assertEqual(obj.f5, 5, "incorrect value: {}".format(obj.f5))
+
+        data=[0,0,0,0,0,0,0,1,0,0,0,3,0,0,0,4,5]
+        data_str="".join([chr(x) for x in data])
+                         
+        obj=self.struct.unpack(data_str)
+        self.assertEqual(obj.f1, 0, "incorrect value: {}".format(obj.f1))
+        self.assertEqual(obj.f2, 1, "incorrect value: {}".format(obj.f2))
+        self.assertEqual(obj.f3, 3, "incorrect value: {}".format(obj.f3))
+        self.assertEqual(obj.f4, 4, "incorrect value: {}".format(obj.f4))
+        self.assertEqual(obj.f5, 5, "incorrect value: {}".format(obj.f5))
+        
+        data=[0,0,0,0,0,0,0,2,0,0,0,3,5]
+        data_str="".join([chr(x) for x in data])
+                         
+        obj=self.struct.unpack(data_str)
+        self.assertEqual(obj.f1, 0, "incorrect value: {}".format(obj.f1))
+        self.assertEqual(obj.f2, 2, "incorrect value: {}".format(obj.f2))
+        self.assertEqual(obj.f3, 3, "incorrect value: {}".format(obj.f3))
+        self.assertEqual(obj.f4, None, "incorrect value: {}".format(obj.f4))
+        self.assertEqual(obj.f5, 5, "incorrect value: {}".format(obj.f5))        
+
+    def test_packing(self):
+        packed_result=self.struct.pack(1,2,None,None,5)
+        data=[0,0,0,1,0,0,0,2,5]
+        data_str="".join([chr(x) for x in data])
+        self.assertEqual(packed_result,data_str,"Invalid packing - {}".format(packed_result.encode("hex")))
+        
+        packed_result=self.struct.pack(0,1,3,4,5)
+        data=[0,0,0,0,0,0,0,1,0,0,0,3,0,0,0,4,5]
+        data_str="".join([chr(x) for x in data])
+        self.assertEqual(packed_result,data_str,"Invalid packing - {}".format(packed_result.encode("hex")))  
+
+        packed_result=self.struct.pack(0,2,3,None,5)
+        data=[0,0,0,0,0,0,0,2,0,0,0,3,5]
+        data_str="".join([chr(x) for x in data])
+        self.assertEqual(packed_result,data_str,"Invalid packing - {}".format(packed_result.encode("hex"))) 
         
 class EStructEmptyArrayTestCase(unittest.TestCase):
     def setUp(self):

@@ -21,6 +21,9 @@ Typical usage::
     	
 	for r in records:
 		print r.Student.Name, r.Student.Address, date.fromordinal(r.Student.DOB)
+		
+EStruct is also hosted on GitHub at https://github.com/simblack/EStruct
+
  		
 Installation
 ============

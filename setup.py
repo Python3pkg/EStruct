@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='EStruct',
-    version='0.1.2',
+    version='0.1.3',
     author='Simon Black',
     author_email='simon.black.bug@gmail.com',
     packages=['estruct','estruct.tests'],
