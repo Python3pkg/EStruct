@@ -83,7 +83,7 @@ class StructObject(object):
             If a set of sub fields where defined, e.g. f1.a1 f1.a2 then these two are resolved to the 
             single top level field f1
         '''
-        fields=self.__fields.keys()
+        fields=list(self.__fields.keys())
         return fields
     
     def SubFields(self, field):
@@ -99,7 +99,7 @@ class StructObject(object):
             If a field does not have sub fields then None is returned.
         '''
         
-        if field not in self.__fields.keys():
+        if field not in list(self.__fields.keys()):
             raise KeyError("Not a field - {}".format(field))
         sub_fields=self.__fields.get(field, None)
         if sub_fields:
@@ -376,7 +376,7 @@ class EStruct(object):
         
     def __update_evaluator(self, evaluator, parent, fields, results):
         #need to make a copy of dict
-        new_evaluator={k:v for k,v in evaluator.items()}
+        new_evaluator={k:v for k,v in list(evaluator.items())}
         if fields is not None and len(fields.Nodes[:len(results)]):
             evaluator_object=fields.CreateInstance('_' if parent is None else parent, *results)
             if parent and parent in evaluator:
@@ -465,7 +465,7 @@ class EStruct(object):
             elif c not in [' ','\t']:
                 field_count+=count if count else 1
                 count=0
-        return getattr(evaluator_object,evaluator_object.__dict__.keys()[field_count])
+        return getattr(evaluator_object,list(evaluator_object.__dict__.keys())[field_count])
             
     def __pack_value(self, structure, structure_str, fields_structure_str, evaluator_object, **kargs):
         value=structure.get("value",None)
@@ -536,7 +536,7 @@ class EStruct(object):
     def __flatten(self, obj):
         if hasattr(obj, "__dict__"):
             flattend_obj=[]
-            for i in obj.__dict__.items():
+            for i in list(obj.__dict__.items()):
                 if i[1] is not None:
                     result=self.__flatten(i[1])
                     if result is not None:

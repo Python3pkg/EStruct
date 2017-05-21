@@ -2,44 +2,44 @@
 from estruct.estruct import EStruct, StructObject
 
 def run_example(name, testdata, struct_params, local={}):
-    print "="*80
-    print "Test:", name
-    print "Test data:", testdata
-    print "EStruct:", struct_params 
-    print "-"*80
+    print("="*80)
+    print("Test:", name)
+    print("Test data:", testdata)
+    print("EStruct:", struct_params) 
+    print("-"*80)
     teststring= "".join([chr(x) for x in testdata])
     
     s=EStruct(*struct_params)
     r1=s.unpack(teststring, **local)
-    print "Unpack:",r1
+    print("Unpack:",r1)
     values=tuple([getattr(r1,v) for v in r1.__dict__])
     packed_result=s.pack(*values, **local)   
-    print "Pack:",packed_result.encode('hex')
-    print "Result:", (packed_result==teststring)
-    print "-"*80,'\n'
+    print("Pack:",packed_result.encode('hex'))
+    print("Result:", (packed_result==teststring))
+    print("-"*80,'\n')
         
 
 if __name__ == "__main__":
     
     f=StructObject("f1 f2.a1 f2.a2 f3.a1.b1 f3.a1.b2 f3.a2")
-    print f
-    print f.Fields
+    print(f)
+    print(f.Fields)
     
     try:
         sf=f.SubFields("Balls to you!")
     except KeyError as ex:
-        print "Expected exception raised!", ex
+        print("Expected exception raised!", ex)
     
     sf=f.SubFields("f1")
-    print sf
+    print(sf)
     sf=f.SubFields("f2")
-    print sf
+    print(sf)
     sf=f.SubFields("f3")    
-    print sf
-    print sf.__repr__()
+    print(sf)
+    print(sf.__repr__())
     
     obj=f.CreateInstance("obj",1,(2,3),((4,5),6))
-    print obj
+    print(obj)
     
     
     run_example("Conditional with True result", 
